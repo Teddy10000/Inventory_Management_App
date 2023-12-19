@@ -86,7 +86,7 @@ class InventoryMCommand(cmd.Cmd):
 
             # Set attributes for the instance
             provided_attributes = argl[1:]
-            expected_attributes = new_instance.__dict__.keys()  # Get the class attributes
+            expected_attributes = [attr for attr in dir(new_instance) if not attr.startswith('_')]  # Get the class attributes
             print(expected_attributes)
             if class_name == "MenuItem":
                 attributes = dict(attribute.split('=') for attribute in provided_attributes)
