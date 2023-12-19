@@ -45,11 +45,11 @@ class BaseModel:
 
     def to_dict(self):
         """returns a dictionary containing all keys/values of __dict__"""
-
         my_dict = self.__dict__.copy()
         my_dict["__class__"] = type(self).__name__
-        my_dict["created_at"] = my_dict["created_at"].isoformat()
-        my_dict["updated_at"] = my_dict["updated_at"].isoformat()
+        my_dict["created_at"] = self.created_at.isoformat()
+        my_dict["updated_at"] = self.updated_at.isoformat()
+        my_dict.pop('storage', None)  # Remove the 'storage' attribute if present
         return my_dict
     
 class Ingredients(BaseModel):
@@ -62,7 +62,7 @@ class Ingredients(BaseModel):
 class MenuItem(BaseModel):
     
         name = ''
-        ingredients = []
+        ingredients_ids = []
         price = 0
 
 #MODEL TO KEEP TRACK OF SUPPLIER INFO
@@ -73,14 +73,14 @@ class Supplier(BaseModel):
 
 class OrderItem(BaseModel):
    
-        ingredient = []
+        ingredient_id = []
         quantity =  0
-        supplier = ''
+        supplier_id = ''
 
 class Order(BaseModel):
   
-        menu_item = ''
-        order_items = []
+        menu_item_id = ''
+        order_items_id = []
      
 
 
