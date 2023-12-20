@@ -86,7 +86,7 @@ class InventoryMCommand(cmd.Cmd):
 
             # Set attributes for the instance
             provided_attributes = argl[1:]
-            expected_attributes = [attr for attr in dir(new_instance) if not attr.startswith('_')]  # Get the class attributes
+            expected_attributes = [attr for attr in dir(new_instance) if not attr.startswith('_') and attr not in ['id', 'created_at', 'save', 'updated_at', 'to_dict']] # Get the class attributes
             print(expected_attributes)
             if class_name == "MenuItem":
                 attributes = dict(attribute.split('=') for attribute in provided_attributes)
@@ -114,11 +114,12 @@ class InventoryMCommand(cmd.Cmd):
                 setattr(new_instance, attr_name, attr_value)
 
             # Check if provided attributes match expected attributes
-            provided_attr_set = set(attr.split('=')[0] for attr in provided_attributes)
+            provided_attr_set = set(attr.split('=')[0] for attr in provided_attributes) 
+
             expected_attr_set = set(expected_attributes)
 
             if provided_attr_set != expected_attr_set:
-                print("** Provided attributes do not match the model attributes. Aborting save. **")
+                print(f"** Provided attributes do not match the model attributes. Aborting save. expected {expected_attributes} but gave only {provided_attr_set} **")
             else:
                 # Save the instance and print its ID
                 storage.new(new_instance)
@@ -194,41 +195,41 @@ class InventoryMCommand(cmd.Cmd):
 # Add similar methods for other commands (e.g., do_update, do_show, etc.) with appropriate usage and examples.
 # These methods should handle updating attributes and provide help
 
-def do_update(self, arg):
-    """Usage: update <class> <id> <attribute_name> <attribute_value> or
-    <class>.update(<id>, <attribute_name>, <attribute_value>) or
-    <class>.update(<id>, <dictionary>)
-    Update a class instance of a given id by adding or updating
-    a given attribute key/value pair or dictionary."""
-    argl = parse(arg)
-    objdict = storage.all()
+    def do_update(self, arg):
+        """Usage: update <class> <id> <attribute_name> <attribute_value> or
+        <class>.update(<id>, <attribute_name>, <attribute_value>) or
+        <class>.update(<id>, <dictionary>)
+        Update a class instance of a given id by adding or updating
+        a given attribute key/value pair or dictionary."""
+        argl = parse(arg)
+        objdict = storage.all()
 
-    if len(argl) < 4:
-        print("** insufficient arguments provided for update command **")
-        return False
+        if len(argl) < 4:
+            print("** insufficient arguments provided for update command **")
+            return False
 
-    class_name = argl[0]
-    instance_id = argl[1]
-    attribute_name = argl[2]
+        class_name = argl[0]
+        instance_id = argl[1]
+        attribute_name = argl[2]
 
-    # Check if the provided class name exists in the available classes
-    if class_name not in InventoryMCommand.__classes:
-        print("** class doesn't exist **")
-        return False
+        # Check if the provided class name exists in the available classes
+        if class_name not in InventoryMCommand.__classes:
+            print("** class doesn't exist **")
+            return False
 
-    # Check if the instance exists in the object dictionary
-    instance_key = "{}.{}".format(class_name, instance_id)
-    if instance_key not in objdict:
-        print("** no instance found **")
-        return False
+        # Check if the instance exists in the object dictionary
+        instance_key = "{}.{}".format(class_name, instance_id)
+        if instance_key not in objdict:
+            print("** no instance found **")
+            return False
 
-    # Update the attribute of the instance
-    new_value = argl[3]
-    obj = objdict[instance_key]
-    setattr(obj, attribute_name, new_value)
+        # Update the attribute of the instance
+        new_value = argl[3]
+        obj = objdict[instance_key]
+        setattr(obj, attribute_name, new_value)
 
-    storage.save()
-    return True
+        storage.save()
+        return True
 
 
 
